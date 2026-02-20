@@ -1,24 +1,30 @@
 name: Cache Demo
 
-on: [push]
+on:
+  push:
+    branches:
+      - main
+      - master
 
 jobs:
-  demo:
+  build:
     runs-on: ubuntu-latest
-    
+
     steps:
-    - uses: actions/checkout@v4
-    
-    # Create fake files to cache (avoids empty path error)
-    - name: Create cache files
-      run: mkdir -p ~/.npm && echo "fake-npm-cache" > ~/.npm/test.txt
-      
-    - name: prime-cache-42b4b9e
-      id: cache-step
-      uses: actions/cache@v4
-      with:
-        path: ~/.npm
-        key: cache-42b4b9e
-        
-    - name: Show cache result
-      run: echo "Cache hit: ${{ steps.cache-step.outputs.cache-hit }}"
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Prime Cache
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/demo
+          key: cache-42b4b9e
+
+      - name: prime-cache-42b4b9e
+        run: echo "Cache hit? ${{ steps.cache.outputs.cache-hit }}"
+
+      - name: Create cache content
+        run: |
+          mkdir -p ~/.cache/demo
+          echo "Cached content" > ~/.cache/demo/data.txt
